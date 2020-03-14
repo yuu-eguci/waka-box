@@ -6,3 +6,4 @@
 ===
 
 [![Actions Status](https://github.com/yuu-eguci/waka-box/workflows/Python%20application/badge.svg)](https://github.com/yuu-eguci/waka-box/actions)
+[![GitHub](https://img.shields.io/github/license/yuu-eguci/waka-box)](https://github.com/yuu-eguci/waka-box/blob/master/LICENSE)
