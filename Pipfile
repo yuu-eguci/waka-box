@@ -8,6 +8,8 @@ autopep8 = "*"
 
 [packages]
 flake8 = "*"
+python-dotenv = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
