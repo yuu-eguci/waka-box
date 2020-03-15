@@ -50,25 +50,27 @@ class EnvNotFoundError(WakaBoxException):
     """
 
 
-def get_wakatime_secret_api_key():
-    """WAKATIME_SECRET_API_KEY を取得します。
+def get_env(keyname: str) -> str:
+    """環境変数を取得します。
+
+    Arguments:
+        keyname {str} -- 環境変数名。
 
     Raises:
-        EnvNotFoundError: WAKATIME_SECRET_API_KEY が環境変数から見つからない。
+        EnvNotFoundError: 環境変数が見つからない。
 
     Returns:
-        str -- WAKATIME_SECRET_API_KEY
+        str -- 環境変数の値。
     """
-
     try:
-        return os.environ['WAKATIME_SECRET_API_KEY']
+        return os.environ[keyname]
     except KeyError as e:
-        raise EnvNotFoundError('WAKATIME_SECRET_API_KEY') from e
+        raise EnvNotFoundError(keyname) from e
 
 
 # .env で環境変数を取得する場合に対応します。見つからなくてもエラーを起こさない。
 dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=False))
-wakatime_secret_api_key = get_wakatime_secret_api_key()
+wakatime_secret_api_key = get_env('WAKATIME_SECRET_API_KEY')
 
 logger = get_my_logger()
 logger.info('foobarbaz')
