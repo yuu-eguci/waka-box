@@ -80,3 +80,46 @@ response = requests.get(
     f'https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key={wakatime_secret_api_key}')  # noqa: E501
 response_json = json.loads(response.text)
 pprint(response_json['data']['languages'])
+
+# 仮のファイルコンテンツ。
+temporary_file_content = '\n'.join([
+    'YAML        9 hrs 22 mins  ██████░░░░░░░░░░░░░░  31.1%',
+    'TypeScript  6 hrs 50 mins  ████░░░░░░░░░░░░░░░░  22.7%',
+    'JSON        5 hrs 42 mins  ███░░░░░░░░░░░░░░░░░  18.9%',
+    'Markdown    3 hrs 12 mins  ██░░░░░░░░░░░░░░░░░░  10.7%',
+    'Other       2 hrs 4 mins   █░░░░░░░░░░░░░░░░░░░   6.9%',
+    'JavaScript  58 mins        ░░░░░░░░░░░░░░░░░░░░   3.3%',
+    'Docker      56 mins        ░░░░░░░░░░░░░░░░░░░░   3.1%',
+    'Git Config  22 mins        ░░░░░░░░░░░░░░░░░░░░   1.2%',
+    'Go          13 mins        ░░░░░░░░░░░░░░░░░░░░   0.8%',
+    'GraphQL     12 mins        ░░░░░░░░░░░░░░░░░░░░   0.7%',
+    'TOML        9 mins         ░░░░░░░░░░░░░░░░░░░░░   0.6%',
+    'INI         1 min          ░░░░░░░░░░░░░░░░░░░░░   0.1%',
+    'XML         1 min          ░░░░░░░░░░░░░░░░░░░░░   0.1%',
+    'Bash        0 secs         ░░░░░░░░░░░░░░░░░░░░░   0.0%',
+    'CSS         0 secs         ░░░░░░░░░░░░░░░░░░░░░   0.0%',
+    'HTML        0 secs         ░░░░░░░░░░░░░░░░░░░░░   0.0%',
+    'Text        0 secs         ░░░░░░░░░░░░░░░░░░░░░   0.0%',
+])
+
+# 認証は access token で行います。
+headers = {
+    'Authorization': f'token {get_env("GITHUB_ACCESS_TOKEN")}',
+}
+# gist を更新します。
+data = json.dumps({
+    # NOTE: なくても良い。
+    # 'description': 'test',
+    'files': {
+        # 更新ファイル名。
+        'file': {
+            'content': temporary_file_content,
+        }
+    },
+})
+response = requests.post(
+    f'https://api.github.com/gists/{get_env("GIST_ID")}',
+    headers=headers,
+    data=data)
+response_json = json.loads(response.text)
+pprint(response_json)
