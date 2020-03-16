@@ -4,6 +4,7 @@ import json
 import requests
 import dotenv
 import math
+import sys
 
 
 def get_my_logger():
@@ -39,7 +40,6 @@ class WakaBoxException(Exception):
     Arguments:
         Exception {[type]} -- [description]
     """
-    pass
 
 
 class EnvNotFoundError(WakaBoxException):
@@ -63,7 +63,11 @@ def get_env(keyname: str) -> str:
         str -- 環境変数の値。
     """
     try:
-        return os.environ[keyname]
+        # GitHub Actions では環境変数が設定されていなくても yaml 内で空文字列が入ってしまう。空欄チェックも行います。
+        _ = os.environ[keyname]
+        if not _:
+            raise KeyError(f'{keyname} is empty.')
+        return _
     except KeyError as e:
         raise EnvNotFoundError(keyname) from e
 
@@ -119,20 +123,26 @@ def generate_file_content_line(raw_data: dict) -> str:
 
 # .env で環境変数を取得する場合に対応します。見つからなくてもエラーを起こさない。
 dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=False))
-wakatime_secret_api_key = get_env('WAKATIME_SECRET_API_KEY')
 
 logger = get_my_logger()
 logger.info('処理開始。')
 
+# wakatime stats を取得します。
+# response の内容は https://wakatime.com/developers/#stats
+wakatime_secret_api_key = get_env('WAKATIME_SECRET_API_KEY')
 response = requests.get(
     # NOTE: 改行は逆に見づらいので E501 を無視します。
     f'https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key={wakatime_secret_api_key}')  # noqa: E501
 response_json = json.loads(response.text)
 logger.info('WakaTime stats 取得完了。')
 
-# ファイルコンテンツを生成します。
-# response の内容は https://wakatime.com/developers/#stats
+# データがなければ処理を終了します。
 languages_raw_data = response_json['data']['languages']
+if not languages_raw_data:
+    logger.warning('stats の languages データが空っぽです。処理終了。')
+    sys.exit()
+
+# ファイルコンテンツを生成します。
 file_content = '\n'.join((generate_file_content_line(_)
                           for _ in languages_raw_data))
 logger.info('gist 更新内容生成完了。')
@@ -143,8 +153,7 @@ headers = {
 }
 # gist を更新します。
 data = json.dumps({
-    # NOTE: description を更新したいときは有効化。
-    # 'description': 'test',
+    'description': '📊 Weekly development breakdown',
     'files': {
         # 更新ファイル名。
         'file': {
