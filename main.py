@@ -130,6 +130,12 @@ def generate_file_content_line(raw_data: dict) -> str:
 
 
 def run():
+    """メインメソッドです。
+
+    Raises:
+        EnvNotFoundError: 環境変数が見つからない。
+        EmptyWakaTimeDataError: WakaTime から取得した stats が空っぽ。
+    """
 
     # logger を取得します。
     logger = get_my_logger()
