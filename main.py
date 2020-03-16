@@ -121,51 +121,67 @@ def generate_file_content_line(raw_data: dict) -> str:
     ])
 
 
-# .env で環境変数を取得する場合に対応します。見つからなくてもエラーを起こさない。
-dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=False))
+def run():
 
-logger = get_my_logger()
-logger.info('処理開始。')
+    # logger を取得します。
+    logger = get_my_logger()
+    logger.info('処理開始。')
 
-# wakatime stats を取得します。
-# response の内容は https://wakatime.com/developers/#stats
-wakatime_secret_api_key = get_env('WAKATIME_SECRET_API_KEY')
-response = requests.get(
-    # NOTE: 改行は逆に見づらいので E501 を無視します。
-    f'https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key={wakatime_secret_api_key}')  # noqa: E501
-response_json = json.loads(response.text)
-logger.info('WakaTime stats 取得完了。')
+    # .env で環境変数を取得する場合に対応します。
+    # raise_error_if_not_found: .env が見つからなくてもエラーを起こさない。
+    dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=False))
 
-# データがなければ処理を終了します。
-languages_raw_data = response_json['data']['languages']
-if not languages_raw_data:
-    logger.warning('stats の languages データが空っぽです。処理終了。')
-    sys.exit()
+    # 必要な環境変数を取得します。
+    WAKATIME_SECRET_API_KEY = get_env('WAKATIME_SECRET_API_KEY')
+    GITHUB_ACCESS_TOKEN = get_env('GITHUB_ACCESS_TOKEN')
+    GIST_ID = get_env('GIST_ID')
 
-# ファイルコンテンツを生成します。
-file_content = '\n'.join((generate_file_content_line(_)
-                          for _ in languages_raw_data))
-logger.info('gist 更新内容生成完了。')
+    # データソース WakaTime stats を取得します。
+    # response の内容は https://wakatime.com/developers/#stats
+    response = requests.get(
+        # NOTE: 改行は逆に見づらいので E501 を無視します。
+        f'https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key={WAKATIME_SECRET_API_KEY}')  # noqa: E501
+    logger.info('WakaTime stats 取得完了。')
 
-# 認証は access token で行います。
-headers = {
-    'Authorization': f'token {get_env("GITHUB_ACCESS_TOKEN")}',
-}
-# gist を更新します。
-data = json.dumps({
-    'description': '📊 Weekly development breakdown',
-    'files': {
-        # 更新ファイル名。
-        'file': {
-            'content': file_content,
-        }
-    },
-})
-response = requests.post(
-    f'https://api.github.com/gists/{get_env("GIST_ID")}',
-    headers=headers,
-    data=data)
-logger.info(f'gist 更新完了。ステータスコード:{response.status_code}')
-response_json = json.loads(response.text)
-logger.info(f'更新内容。\n{response_json["files"]["file"]["content"]}')
-logger.info(f'処理終了。')
+    # データソースを検証します。データがなければ処理終了です。
+    response_json = json.loads(response.text)
+    languages_raw_data = response_json['data']['languages']
+    if not languages_raw_data:
+        logger.warning('stats の languages データが空っぽです。処理終了。')
+        return
+
+    # gist 用ファイルコンテンツを生成します。
+    file_content = '\n'.join((generate_file_content_line(_)
+                              for _ in languages_raw_data))
+    logger.info('gist 更新内容生成完了。')
+
+    # gist の更新データを作成します。
+    headers = {
+        # 認証はパスワードでなく access token で行います。
+        'Authorization': f'token {GITHUB_ACCESS_TOKEN}',
+    }
+    data = json.dumps({
+        'description': '📊 Weekly development breakdown',
+        'files': {
+            # 更新ファイル名。
+            'file': {
+                'content': file_content,
+            }
+        },
+    })
+    # gist を更新します。
+    response = requests.post(
+        f'https://api.github.com/gists/{GIST_ID}',
+        headers=headers,
+        data=data)
+    logger.info(f'gist 更新完了。ステータスコード:{response.status_code}')
+
+    # 更新内容のロギングです。
+    response_json = json.loads(response.text)
+    logger.info(f'更新内容。\n{response_json["files"]["file"]["content"]}')
+
+    logger.info(f'処理終了。')
+
+
+if __name__ == "__main__":
+    run()
