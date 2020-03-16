@@ -50,6 +50,14 @@ class EnvNotFoundError(WakaBoxException):
     """
 
 
+class EmptyWakaTimeDataError(WakaBoxException):
+    """WakaTime から取得したデータが空っぽであることを表す例外クラス。
+
+    Arguments:
+        WakaBoxException {[type]} -- [description]
+    """
+
+
 def get_env(keyname: str) -> str:
     """環境変数を取得します。
 
@@ -147,8 +155,9 @@ def run():
     response_json = json.loads(response.text)
     languages_raw_data = response_json['data']['languages']
     if not languages_raw_data:
-        logger.warning('stats の languages データが空っぽです。処理終了。')
-        return
+        raise EmptyWakaTimeDataError(
+            'stats の languages データが空っぽです。'
+            'このエラーは一晩おくことで解消する可能性があります。')
 
     # gist 用ファイルコンテンツを生成します。
     file_content = '\n'.join((generate_file_content_line(_)
