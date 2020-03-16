@@ -51,3 +51,13 @@ pipenv run python main.py
 Register env variables and run by GitHub Actions.
 
 ![secrets](https://user-images.githubusercontent.com/28250432/76698894-968ede00-669f-11ea-957b-0486d3748e2c.png)
+
+## Gist
+
+[https://gist.github.com/yuu-eguci/10a7031088fb0e783dc92e721c6443c3](https://gist.github.com/yuu-eguci/10a7031088fb0e783dc92e721c6443c3)
+
+## What I learned this time
+
+![what-i-learned](https://user-images.githubusercontent.com/28250432/76726931-85e77200-674a-11ea-826a-c207841ed9f8.png)
+
+- [https://gitmoji.carloscuesta.me/](https://gitmoji.carloscuesta.me/)
