@@ -4,8 +4,6 @@
   <p align="center">📊 Update a pinned gist to contain your weekly WakaTime stats</p>
 </p>
 
-===
-
 [![Actions Status](https://github.com/yuu-eguci/waka-box/workflows/Python%20application/badge.svg)](https://github.com/yuu-eguci/waka-box/actions)
 [![GitHub](https://img.shields.io/github/license/yuu-eguci/waka-box)](https://github.com/yuu-eguci/waka-box/blob/master/LICENSE)
 
@@ -14,6 +12,22 @@
 - Python script
 - Converts WakaTime stats to bar charts and publishes on specified gist
 - Intended to run by GitHub Actions
+
+## Use on your own GitHub overview
+
+1. Register WakaTime account at [https://wakatime.com/](https://wakatime.com/).
+1. Install WakaTime plugins into your editors following [plugin install instructions](https://wakatime.com/plugins).
+1. Create your own waka-box repository by pushing **Use this template** button at [waka-box top page](https://github.com/yuu-eguci/waka-box).
+    - GitHub Actions workflow automatically runs and it shows `EnvNotFoundError` this time.
+1. Register three env variables as repository secrets.
+    - WAKATIME_SECRET_API_KEY: Get your WakaTime Secret API Key from [your account page](https://wakatime.com/settings/account).
+    - GIST_ID: Create a public gist with a file named **`file`** and get the gist id. `https://gist.github.com/username/[gist id]`
+    - GITHUB_ACCESS_TOKEN: Create a token from GitHub Settings > Developer settings > Personal access tokens > Generate new token > Check gist and generate
+    - Set them as repository secrets - Repository settings > Secrets
+1. Pin the gist on your GitHub overview.
+1. Open Actions tab > Open your workflow result > build > Re-run jobs
+    - It is possible that it shows `EmptyWakaTimeDataError` because WakaTime API data can be empty for a while after registration.
+1. After that, the jobs automatically run by every 12 hours.
 
 ## Installation
 
@@ -34,6 +48,6 @@ pipenv run python main.py
 
 ### On GitHub Actions
 
-Register env variables run by GitHub Actions.
+Register env variables and run by GitHub Actions.
 
 ![secrets](https://user-images.githubusercontent.com/28250432/76698894-968ede00-669f-11ea-957b-0486d3748e2c.png)
