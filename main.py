@@ -4,7 +4,6 @@ import json
 import requests
 import dotenv
 import math
-import sys
 
 
 def get_my_logger():
@@ -44,14 +43,6 @@ class WakaBoxException(Exception):
 
 class EnvNotFoundError(WakaBoxException):
     """特定の環境変数が見つからないことを表す例外クラス。
-
-    Arguments:
-        WakaBoxException {[type]} -- [description]
-    """
-
-
-class EmptyWakaTimeDataError(WakaBoxException):
-    """WakaTime から取得したデータが空っぽであることを表す例外クラス。
 
     Arguments:
         WakaBoxException {[type]} -- [description]
@@ -134,13 +125,7 @@ def run():
 
     Raises:
         EnvNotFoundError: 環境変数が見つからない。
-        EmptyWakaTimeDataError: WakaTime から取得した stats が空っぽ。
     """
-
-    # logger を取得します。
-    logger = get_my_logger()
-    logger.info('処理開始。')
-
     # .env で環境変数を取得する場合に対応します。
     # raise_error_if_not_found: .env が見つからなくてもエラーを起こさない。
     dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=False))
@@ -161,9 +146,10 @@ def run():
     response_json = json.loads(response.text)
     languages_raw_data = response_json['data']['languages']
     if not languages_raw_data:
-        raise EmptyWakaTimeDataError(
+        logger.warning(
             'stats の languages データが空っぽです。'
             'このエラーは一晩おくことで解消する可能性があります。')
+        return
 
     # gist 用ファイルコンテンツを生成します。
     file_content = '\n'.join((generate_file_content_line(_)
@@ -195,8 +181,10 @@ def run():
     response_json = json.loads(response.text)
     logger.info(f'更新内容。\n{response_json["files"]["file"]["content"]}')
 
-    logger.info(f'処理終了。')
-
 
 if __name__ == "__main__":
+    # logger を取得します。
+    logger = get_my_logger()
+    logger.info('処理開始。')
     run()
+    logger.info('処理終了。')
