@@ -32,3 +32,4 @@ jobs:
         WAKATIME_SECRET_API_KEY: ${{ secrets.WAKATIME_SECRET_API_KEY }}
         GIST_ID: ${{ secrets.GIST_ID }}
         GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        DRY_RUN: ${{ secrets.DRY_RUN }}
