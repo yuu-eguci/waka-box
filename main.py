@@ -134,6 +134,8 @@ def run():
     WAKATIME_SECRET_API_KEY = get_env('WAKATIME_SECRET_API_KEY')
     GITHUB_ACCESS_TOKEN = get_env('GITHUB_ACCESS_TOKEN')
     GIST_ID = get_env('GIST_ID')
+    # DRY_RUN のみデフォルト値 False で取得します。
+    DRY_RUN = bool(os.environ.get('DRY_RUN', False))
 
     # データソース WakaTime stats を取得します。
     # response の内容は https://wakatime.com/developers/#stats
@@ -155,6 +157,12 @@ def run():
     file_content = '\n'.join((generate_file_content_line(_)
                               for _ in languages_raw_data))
     logger.info('gist 更新内容生成完了。')
+
+    # DRY_RUN 時は更新内容を表示して終了します。
+    if DRY_RUN:
+        logger.info('DRY_RUN')
+        logger.info(f'更新内容。\n{file_content}')
+        return
 
     # gist の更新データを作成します。
     headers = {
