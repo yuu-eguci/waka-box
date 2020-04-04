@@ -4,6 +4,8 @@ import json
 import requests
 import dotenv
 import math
+import typing
+import functools
 
 
 def get_my_logger():
@@ -31,6 +33,10 @@ def get_my_logger():
     # 親ロガーへの(伝播をオフにします。
     logger.propagate = False
     return logger
+
+
+# logger を取得します。
+logger = get_my_logger()
 
 
 class WakaBoxException(Exception):
@@ -120,6 +126,31 @@ def generate_file_content_line(raw_data: dict) -> str:
     ])
 
 
+def function_execution_announcer_decorator(
+        logger: logging.Logger) -> typing.Callable:
+    """functools.wraps を使ってみたいがために作ってみたデコレータです。
+    これを付与した関数の最初と最後で「処理開始」「処理終了」をアナウンス(logger.info)します。
+    ロギングのためのロガーインスタンスを渡してください。
+
+    Arguments:
+        logger {logging.Logger} -- アナウンスのためのロガーインスタンス。
+
+    Returns:
+        typing.Callable -- デコレータなので関数を返します。
+    """
+    def _function_execution_announcer_decorator(func: typing.Callable):
+        # デコレータ定義するときは functools.wraps を使います。(Effective Python で覚えた。)
+        # @functools.wraps(func)
+        def __function_execution_announcer_decorator(*args, **kwargs):
+            logger.info('処理開始。')
+            result = func(*args, **kwargs)
+            logger.info('処理終了。')
+            return result
+        return __function_execution_announcer_decorator
+    return _function_execution_announcer_decorator
+
+
+@function_execution_announcer_decorator(logger)
 def run():
     """メインメソッドです。
 
@@ -191,8 +222,4 @@ def run():
 
 
 if __name__ == "__main__":
-    # logger を取得します。
-    logger = get_my_logger()
-    logger.info('処理開始。')
     run()
-    logger.info('処理終了。')
