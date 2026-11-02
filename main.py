@@ -93,6 +93,8 @@ def _generate_bar_chart(percent: float, size: int) -> str:
     semifull = '█▏▎▍▌▋▊▉'
     empty = '░'
     frac = math.ceil(size * 8 * percent / 100)
+    if frac == 0:
+        return empty * size
     barsFull = math.ceil(frac / 8)
     semi = int(frac % 8)
     barsEmpty = size - barsFull
