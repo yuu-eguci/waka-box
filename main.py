@@ -55,6 +55,30 @@ class EnvNotFoundError(WakaBoxException):
     """
 
 
+class ApiRequestError(WakaBoxException):
+    """API リクエストが失敗したことを表す例外クラス。"""
+
+
+# API リクエストのタイムアウト秒数。
+REQUEST_TIMEOUT_SECONDS = 30
+
+
+def _check_response(response: requests.Response, api_name: str) -> None:
+    """レスポンスが失敗なら ApiRequestError を送出します。
+    URL には api_key が含まれるので、メッセージには出しません。
+
+    Arguments:
+        response {requests.Response} -- レスポンス。
+        api_name {str} -- メッセージ用の API 名。
+
+    Raises:
+        ApiRequestError: ステータスコードが 4xx か 5xx。
+    """
+    if not response.ok:
+        raise ApiRequestError(
+            f'{api_name} が失敗しました。ステータスコード:{response.status_code}')
+
+
 def get_env(keyname: str) -> str:
     """環境変数を取得します。
 
@@ -158,6 +182,7 @@ def run():
 
     Raises:
         EnvNotFoundError: 環境変数が見つからない。
+        ApiRequestError: API リクエストが失敗した。
     """
     # .env で環境変数を取得する場合に対応します。
     # raise_error_if_not_found: .env が見つからなくてもエラーを起こさない。
@@ -174,7 +199,9 @@ def run():
     # response の内容は https://wakatime.com/developers/#stats
     response = requests.get(
         # NOTE: 改行は逆に見づらいので E501 を無視します。
-        f'https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key={WAKATIME_SECRET_API_KEY}')  # noqa: E501
+        f'https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key={WAKATIME_SECRET_API_KEY}',  # noqa: E501
+        timeout=REQUEST_TIMEOUT_SECONDS)
+    _check_response(response, 'WakaTime stats 取得')
     logger.info('WakaTime stats 取得完了。')
 
     # データソースを検証します。データがなければ処理終了です。
@@ -212,10 +239,12 @@ def run():
         },
     })
     # gist を更新します。
-    response = requests.post(
+    response = requests.patch(
         f'https://api.github.com/gists/{GIST_ID}',
         headers=headers,
-        data=data)
+        data=data,
+        timeout=REQUEST_TIMEOUT_SECONDS)
+    _check_response(response, 'gist 更新')
     logger.info(f'gist 更新完了。ステータスコード:{response.status_code}')
 
     # 更新内容のロギングです。
