@@ -4,8 +4,10 @@
   <p align="center">📊 Update a pinned gist to contain your weekly WakaTime stats</p>
 </p>
 
-[![Actions Status](https://github.com/yuu-eguci/waka-box/workflows/Python%20application/badge.svg)](https://github.com/yuu-eguci/waka-box/actions)
-[![GitHub](https://img.shields.io/github/license/yuu-eguci/waka-box)](https://github.com/yuu-eguci/waka-box/blob/master/LICENSE)
+<p align="center">
+  <a href="https://github.com/yuu-eguci/waka-box/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/yuu-eguci/waka-box/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/yuu-eguci/waka-box/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/yuu-eguci/waka-box"></a>
+</p>
 
 ## Description
 
@@ -13,25 +15,40 @@
 - Converts WakaTime stats to bar charts and publishes on specified gist
 - Intended to run by GitHub Actions
 
+## Environment
+
+- Python 3.14 + Pipenv
+- GitHub Actions
+    - `CI`: lint and test on push to master and on pull requests
+    - `Update gist`: every 12 hours, or manually with Run workflow
+- Docker: not used!
+
+## Quick run
+
+```bash
+pipenv install --dev
+pipenv run flake8 main.py tests
+pipenv run python -m pytest
+DRY_RUN=1 pipenv run python main.py
+```
+
+`DRY_RUN` set to any non-empty value prints the content instead of updating the gist. The other env variables are still required.
+
 ## Use on your own GitHub overview
 
 1. Register WakaTime account at [https://wakatime.com/](https://wakatime.com/).
 1. Install WakaTime plugins into your editors following [plugin install instructions](https://wakatime.com/plugins).
-1. Create your own waka-box repository by pushing **Use this template** button at [waka-box top page](https://github.com/yuu-eguci/waka-box).
-    - GitHub Actions workflow automatically runs and it shows `EnvNotFoundError` this time.
-1. Register three env variables as repository secrets.
+1. Create your own waka-box repository with the **Use this template** button at [waka-box top page](https://github.com/yuu-eguci/waka-box).
+1. Register three repository secrets at Settings > Secrets and variables > Actions.
     - WAKATIME_SECRET_API_KEY: Get your WakaTime Secret API Key from [your account page](https://wakatime.com/settings/account).
     - GIST_ID: Create a public gist with a file named **`file`** and get the gist id. `https://gist.github.com/username/[gist id]`
-    - GITHUB_ACCESS_TOKEN: Create a token from GitHub Settings > Developer settings > Personal access tokens > Generate new token > Check gist and generate
-    - Set them as repository secrets - Repository settings > Secrets
+    - GITHUB_ACCESS_TOKEN: Create a personal access token that can write gists (classic token: `gist` scope).
 1. Pin the gist on your GitHub overview.
-1. Open Actions tab > Open your workflow result > build > Re-run jobs
-    - It is possible that it shows `EmptyWakaTimeDataError` because WakaTime API data can be empty for a while after registration.
-1. After that, the jobs automatically run by every 12 hours.
+1. Open Actions tab > Update gist > Run workflow.
+    - WakaTime stats can be empty for a while after registration. Then the job only logs a warning.
+1. After that, the job runs every 12 hours.
 
-## Installation
-
-### On local
+## Run locally
 
 Create .env and run.
 
@@ -46,18 +63,12 @@ pipenv install
 pipenv run python main.py
 ```
 
-### On GitHub Actions
-
-Register env variables and run by GitHub Actions.
-
-![secrets](https://user-images.githubusercontent.com/28250432/76698894-968ede00-669f-11ea-957b-0486d3748e2c.png)
-
 ## Gist
 
 [https://gist.github.com/yuu-eguci/10a7031088fb0e783dc92e721c6443c3](https://gist.github.com/yuu-eguci/10a7031088fb0e783dc92e721c6443c3)
 
 ## What I learned this time
 
-![what-i-learned](https://user-images.githubusercontent.com/28250432/76726931-85e77200-674a-11ea-826a-c207841ed9f8.png)
+<img alt="what-i-learned" src="https://user-images.githubusercontent.com/28250432/76726931-85e77200-674a-11ea-826a-c207841ed9f8.png">
 
-- [https://gitmoji.carloscuesta.me/](https://gitmoji.carloscuesta.me/)
+- [https://gitmoji.dev/](https://gitmoji.dev/)

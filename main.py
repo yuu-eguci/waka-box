@@ -140,7 +140,7 @@ def function_execution_announcer_decorator(
     """
     def _function_execution_announcer_decorator(func: typing.Callable):
         # デコレータ定義するときは functools.wraps を使います。(Effective Python で覚えた。)
-        # @functools.wraps(func)
+        @functools.wraps(func)
         def __function_execution_announcer_decorator(*args, **kwargs):
             logger.info('処理開始。')
             result = func(*args, **kwargs)
