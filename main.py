@@ -56,10 +56,10 @@ class EnvNotFoundError(WakaBoxException):
 
 
 class ApiRequestError(WakaBoxException):
-    """API リクエストが失敗したことを表す例外クラス。"""
+    """API リクエストが失敗したことを表す例外クラスです。"""
 
 
-# API リクエストのタイムアウト秒数。
+# API リクエストのタイムアウト秒数です。
 REQUEST_TIMEOUT_SECONDS = 30
 
 
@@ -68,11 +68,11 @@ def _check_response(response: requests.Response, api_name: str) -> None:
     URL には api_key が含まれるので、メッセージには出しません。
 
     Arguments:
-        response {requests.Response} -- レスポンス。
-        api_name {str} -- メッセージ用の API 名。
+        response {requests.Response} -- 確認するレスポンスです。
+        api_name {str} -- メッセージに使う API 名です。
 
     Raises:
-        ApiRequestError: ステータスコードが 4xx か 5xx。
+        ApiRequestError: ステータスコードが 4xx か 5xx です。
     """
     if not response.ok:
         raise ApiRequestError(
@@ -182,7 +182,7 @@ def run():
 
     Raises:
         EnvNotFoundError: 環境変数が見つからない。
-        ApiRequestError: API リクエストが失敗した。
+        ApiRequestError: API リクエストが失敗しました。
     """
     # .env で環境変数を取得する場合に対応します。
     # raise_error_if_not_found: .env が見つからなくてもエラーを起こさない。

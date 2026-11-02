@@ -76,3 +76,21 @@ def test_run_updates_gist_with_patch_and_timeouts(env, monkeypatch):
         ('patch', 'https://api.github.com/gists/dummy-gist'),
     ]
     assert all(kwargs.get('timeout') for _, _, kwargs in calls)
+
+
+POLITE_ENDINGS = ('です。', 'でした。', 'ます。', 'ました。', 'ません。')
+
+
+def _sentence_lines(doc):
+    return [line.strip() for line in doc.splitlines()
+            if line.strip().endswith('。')]
+
+
+def test_new_docstrings_use_desu_masu():
+    lines = (_sentence_lines(main.ApiRequestError.__doc__)
+             + _sentence_lines(main._check_response.__doc__)
+             + [line for line in _sentence_lines(main.run.__doc__)
+                if line.startswith('ApiRequestError:')])
+    assert lines
+    for line in lines:
+        assert line.endswith(POLITE_ENDINGS), line
