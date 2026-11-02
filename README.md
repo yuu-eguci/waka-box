@@ -29,10 +29,7 @@
 pipenv install --dev
 pipenv run flake8 main.py tests
 pipenv run python -m pytest
-DRY_RUN=1 pipenv run python main.py
 ```
-
-`DRY_RUN` set to any non-empty value prints the content instead of updating the gist. The other env variables are still required.
 
 ## Use on your own GitHub overview
 
@@ -62,6 +59,8 @@ GITHUB_ACCESS_TOKEN=***
 pipenv install
 pipenv run python main.py
 ```
+
+Set `DRY_RUN` to any non-empty value to print the content instead of updating the gist.
 
 ## Gist
 
