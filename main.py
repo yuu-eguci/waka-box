@@ -182,6 +182,7 @@ def run():
 
     Raises:
         EnvNotFoundError: 環境変数が見つからない。
+        ApiRequestError: API リクエストが失敗した。
     """
     # .env で環境変数を取得する場合に対応します。
     # raise_error_if_not_found: .env が見つからなくてもエラーを起こさない。
